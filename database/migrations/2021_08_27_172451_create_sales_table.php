@@ -21,8 +21,8 @@ class CreateSalesTable extends Migration
             $table->enum('state', ['pending', 'paid']);
             $table->float('total_price', 10, 2);
             $table->smallInteger('amount');
-            $table->foreignId('register_by')->constrained('users');
-            $table->foreignId('client_id')->constrained('clients');
+           // $table->foreignId('register_by')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }

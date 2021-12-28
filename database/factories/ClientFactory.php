@@ -25,12 +25,12 @@ class ClientFactory extends Factory
     {
         $user = User::where('email', 'example@example.com')->first();
         return [
-            'first_name' => $this->faker->name(),
+            /* 'first_name' => $this->faker->name(),
             'last_name' => $this->faker->lastname(),
             'dni' => Str::random(8),
             'email' => $this->faker->unique()->safeEmail(),
             'type_document' => $this->faker->randomElement(['C.C', 'C.E', 'PAS', 'P.E.P']),
-            'register_by' => $user->id,
+            'register_by' => $user->id, */
         ];
     }
 }

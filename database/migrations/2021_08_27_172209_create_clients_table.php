@@ -13,17 +13,17 @@ class CreateClientsTable extends Migration
      */
     public function up()
     {
-        Schema::create('clients', function (Blueprint $table) {
+      Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('dni');
             $table->string('email')->unique();
             $table->enum('type_document', (['C.C', 'C.E', 'PAS', 'P.E.P']))->default('C.C');
-            $table->foreignId('register_by')->constrained('users');
+           // $table->foreignId('register_by')->constrained('users');
             $table->rememberToken();
             $table->timestamps();
-        });
+        }); 
     }
 
     /**

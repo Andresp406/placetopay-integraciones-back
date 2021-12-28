@@ -25,6 +25,8 @@ class UserFactory extends Factory
         return [
             'first_name' => $this->faker->name(),
             'last_name' => $this->faker->lastname(),
+            'dni' => Str::random(8),
+            'type_document' => $this->faker->randomElement(['C.C', 'C.E', 'PAS', 'P.E.P']),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => bcrypt('12345678'),

@@ -32,9 +32,9 @@ class SalesFactory extends Factory
             'state' => $this->faker->randomElement(['pending', 'paid']),
             'total_price' => $amount * $unit_price,
             'amount' => $amount,
-            'register_by' => function() {
+           /*  'register_by' => function() {
                 return User::factory()->create()->id;
-            },
+            }, */
             'client_id' => function() {
                 return CLient::factory()->create()->id;
             },

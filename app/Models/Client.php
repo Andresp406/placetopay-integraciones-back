@@ -22,7 +22,7 @@ class Client extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'id';
+   // protected $primaryKey = 'id';
 
     /**
      * The "type" of the primary key ID.
@@ -42,7 +42,7 @@ class Client extends Model
         'dni',
         'type_document',
         'email',
-        'register_by',
+    //    'register_by',
     ];
 
     /**
