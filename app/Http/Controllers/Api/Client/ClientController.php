@@ -5,19 +5,20 @@ namespace App\Http\Controllers\Api\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientStoreRequest;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
     public function index()
     {
-        $clients = Client::select('*')
+        $users = User::select('*')
             ->search(request()->search)
             ->get();
 
         return response()->json([
             'ok' => true,
-            'data' => $clients,
+            'data' => $users,
             'message' => 'success',
         ]);
 
@@ -25,11 +26,11 @@ class ClientController extends Controller
 
     public function store(ClientStoreRequest $request)
     {
-        $client = Client::create($request->all());
+        $user = User::create($request->all());
 
         return response()->json([
             'ok'    => true,
-            'data'  => $client,
+            'data'  => $user,
             'message' => 'success'
         ]);
     }

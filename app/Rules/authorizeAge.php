@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Carbon;
 
@@ -27,7 +27,7 @@ class authorizeAge implements Rule
      */
     public function passes($attribute, $value)
     {
-        $client = Client::find($value);
+        $client = User::find($value);
         $age = Carbon::create($client->birth_date)->diffInYears();
         return $age > 20 && $age < 80;
     }

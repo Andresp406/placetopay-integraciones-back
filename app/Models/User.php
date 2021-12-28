@@ -26,6 +26,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array
@@ -35,6 +42,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+      /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
     /**
      * The attributes that should be cast.
      *
@@ -43,6 +57,38 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = [
+        //'years',
+        'full_name'
+    ];
+
+    public $incrementing = true;
+
+
+     //TODO Mutators models Client
+     public function getFullNameAttribute()
+     {
+         return "$this->first_name $this->last_name";
+     }
+
+
+     //TODO Relations models Client
+
+    public function r_sales()
+    {
+        return $this->hasMany(Sales::class, 'user_id', 'id');
+    }
+    //TODO Scopes models Client
+
+    public function scopeSearch($query, $termino)
+    {
+        if($termino === '' || $termino === null) {
+            return;
+        }
+        $query->where('first_name', 'like', "%{$termino}%")
+            ->orWhere('last_name', 'like', "%{$termino}%");
+    }
 
     
 }
