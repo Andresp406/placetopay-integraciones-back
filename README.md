@@ -1,7 +1,7 @@
 
 ## Datos de instalacion
 
-Prueba de seleccion ecotierra. para la instalacion se debe clonar el repositorio con el comando `git clone https://github.com/andresp406/Ecotierra-back.git` por consola de comando, luego se debe generar la key por medio del comando `sail artisan key:generate`, esta aplicacion usa docker como servidor en el back-end, luego generamos las migraciones por medio del comando `sail artisan migrate:fresh --seed` a la vez generamos los seeders de prueba para tener ya datos de pruebas en los endpoint solicitados.
+Prueba de seleccion Evertec. para la instalacion se debe clonar el repositorio con el comando `git clone https://github.com/andresp406/placetopay-integraciones-back.git` por consola de comando, luego se debe generar la key por medio del comando `sail artisan key:generate`, esta aplicacion usa docker como servidor en el back-end, luego generamos las migraciones por medio del comando `sail artisan migrate:fresh --seed` a la vez generamos los seeders de prueba para tener ya datos de pruebas en los endpoint solicitados.
 
 ## Instalacion de Postman
 Nos dirigimos a la pagina oficial de [Postman](https://www.postman.com/) lo instalamos e importamos el json que adjunto para cargar los endpoint. inicialmente habia creado otros endpoint pensando en la autenticacion pero viendo los requerimientos no los use, en ese orden de ideas solo se deben usar los endpoint de 
