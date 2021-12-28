@@ -38,7 +38,7 @@ class SaleStoreRequest extends FormRequest
             'total_price' => 'required|numeric',
             'state' => 'in:paid,pending',
             'amount' => 'required',
-            'client_id' => ['required', new authorizeAge, new PendingPaid],
+            //'client_id' => ['required', new authorizeAge, new PendingPaid],
         ];
     }
 }
