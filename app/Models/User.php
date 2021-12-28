@@ -15,80 +15,37 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
-        'email',        
-        'dni',
-        'type_document',
+        'email',
         'password',
     ];
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'users';
-
-    /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-      /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
     /**
      * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = [
-        //'years',
-        'full_name'
-    ];
-
-    public $incrementing = true;
-
-
-     //TODO Mutators models Client
-     public function getFullNameAttribute()
-     {
-         return "$this->first_name $this->last_name";
-     }
-
-
-     //TODO Relations models Client
-
-    public function r_sales()
+    public function r_products()
     {
-        return $this->hasMany(Sales::class, 'user_id', 'id');
+        return $this->belongsToMany(Product::class, 'product_user', 'user_id', 'product_id')
+            ->withTimestamps()
+            ->withPivot('total_price', 'amount');
     }
-    //TODO Scopes models Client
-
-    public function scopeSearch($query, $termino)
-    {
-        if($termino === '' || $termino === null) {
-            return;
-        }
-        $query->where('first_name', 'like', "%{$termino}%")
-            ->orWhere('last_name', 'like', "%{$termino}%");
-    }
-
-    
 }
