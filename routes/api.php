@@ -1,10 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PlacetopayController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PseController;
 use App\Http\Controllers\SaleController;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,10 +28,13 @@ Route::post('/register', [AuthController::class, 'register'])->name('auth.regist
 Route::group(['prefix' => 'product'], function() {
     Route::get('all', [ProductController::class, 'all'])->name('product.all');
 });
+Route::get('/sale/pse', [PseController::class, 'pseCheckout'])->name('checkout.pse');
 
-Route::get('/sale/my-sales', [SaleController::class, 'checkoutResponse'])->name('sale.my-sales');
 Route::group(['middleware' => 'auth:sanctum'], function(){
+    Route::get('/sale/my-sales', [SaleController::class, 'mySales'])->name('sale.my-sales');
+    Route::get('/response-checkout', [SaleController::class, 'checkoutResponse'])->name('response.checkout');
     Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
     Route::post('/sale', [SaleController::class, 'sale'])->name('sale.sale');
+
 
 });

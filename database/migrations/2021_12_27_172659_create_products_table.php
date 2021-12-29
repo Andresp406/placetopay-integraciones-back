@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->string('img');
             $table->float('price');
-            $table->enum('status', ['CREATED', 'PAYED', 'REJECTED']);
+            $table->enum('status', ['CREATED', 'APPROVED', 'REJECTED']);
 
             $table->timestamps();
         });

@@ -9,21 +9,18 @@ use App\Models\OrderRequestPayment;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-
 
 class SaleController extends Controller
 {
-    //use PlacetopayTrait;
 
-
-    public function sale(SaleRequest $request)
+   public function sale(SaleRequest $request)
     {
         $user = User::find(auth()->id());
         $product = Product::find($request->product_id);
         $total_price = $product->price * $request->amount;
-        $code = 1;
+        $code = $request->product_id;
 
+     
 
         $order = Product::where('id', $code)->first();
         if ($order == false) {
@@ -47,10 +44,10 @@ class SaleController extends Controller
                 "email" => $user->email,
                 "document" => $user->document,
                 "documentType" => $user->type_document,
-                //"mobile" => $order->customer->mobile
+                //"mobile" => 
             ],
             'expiration' => date('c', strtotime(' + 2 days')),
-            'returnUrl' => route('sale.my-sales') . '?reference=' . $reference,
+            'returnUrl' => route('response.checkout') . '?reference=' . $reference,
             'ipAddress' => '127.0.0.1',
             'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
         ];
@@ -62,9 +59,9 @@ class SaleController extends Controller
                 // Redirect the client to the processUrl or display it on the JS extension
                 $this->createRequestPayment($order->id, $response->requestId(), $response->processUrl());
                 return response([
-                    'success' => true,
+                    'ok' => true,
+                    'message' => 'order purchase successful generate',
                     'data' => $response->processUrl(),
-                    'message' => 'order purchase successful generate'
                 ]);               
             } else {
                 // There was some error so check the message
@@ -74,29 +71,7 @@ class SaleController extends Controller
             var_dump($e->getMessage());
         }
 
-        //$this->checkoutRequest($code, $user, $total_price);
-
-
-         /* $user->r_products()->attach([
-            $request->product_id =>
-            [
-                'amount'    => $request->amount,
-                'total_price' => $total_price
-            ]
-            ]);
         
-
-        return response([
-            'ok'    =>true,
-            'message' => 'Transaction success',
-            'data' => [
-                'product' => $product,
-                'amount'  => $request->amount,
-                'total_price' => $total_price,
-               
-            ]
-        ]); 
-  */
     }
 
     public function mySales(Request $request)
@@ -111,18 +86,16 @@ class SaleController extends Controller
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
-            'data' => [
-               $data
-            ]
+            'data' => [$data]
         ]);  
     }
 
     
     public function checkoutResponse(Request $request)
     {
+        
         $reference = $request->reference;
         $order = Product::where('id', $reference)->first();
-        //dd( Order::where('code', $reference)->first(), $reference);
         if ($order == false) {
             abort(404);
         }
@@ -132,11 +105,11 @@ class SaleController extends Controller
         ->latest()
         ->first();
         
-        //dd($orderRequestPayment);
         $placetopay = $this->getClient();
 
         try {
             $response = $placetopay->query($orderRequestPayment->request_id);
+            
 
             if ($response->isSuccessful()) {
                 // In order to use the functions please refer to the RedirectInformation class
@@ -147,15 +120,16 @@ class SaleController extends Controller
 
                     $order->status = Product::STATUS_PAYED;
                     $order->update();
+                    $this->saveDatabase($response);
                 }
 
                 $orderRequestPayment->status = $response->status()->status();
                 $orderRequestPayment->response = json_encode($response->toArray());
                 $orderRequestPayment->update();
 
-                return view('welcome', [
-                    'message' => $response->status()->message(),
-                ]);
+           
+                return redirect()->to("http://localhost:4200/orders?{$response->status()->status()}"); 
+           
             } else {
                 // There was some error with the connection so check the message
                 print_r($response->status()->message() . "\n");
@@ -165,9 +139,32 @@ class SaleController extends Controller
         }
     }
 
+    public function saveDatabase($response){
+        $total_price = $response->request()->payment()->amount()->total();
 
+        dd($response, auth()->user());
+      /*$user->r_products()->attach([
+            $product->id =>
+            [
+                'amount'    => $request->amount,
+                'total_price' => $total_price
+            ]
+            ]);
+        
+        return response([
+            'ok'    =>true,
+            'message' => 'Transaction success',
+            'data' => [
+                'product' => $product,
+                'amount'  => $request->amount,
+                'total_price' => $total_price,
+               
+            ]
+        ]);  */
+  
+    }
 
-    protected function getClient()
+    private function getClient()
     {
         return new PlacetoPay([
             'login' => config('placetopay.login'), // Provided by PlacetoPay
@@ -177,7 +174,7 @@ class SaleController extends Controller
         ]);
     }
 
-    protected function createRequestPayment($orderId, $requestId, $requestUrl)
+    private function createRequestPayment($orderId, $requestId, $requestUrl)
     {
         
          OrderRequestPayment::create([
