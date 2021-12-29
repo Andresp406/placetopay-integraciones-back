@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,8 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->string('img');
             $table->float('price');
+            $table->enum('status', ['CREATED', 'PAYED', 'REJECTED']);
+
             $table->timestamps();
         });
     }

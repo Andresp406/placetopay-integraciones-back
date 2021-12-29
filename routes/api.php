@@ -30,7 +30,7 @@ Route::group(['prefix' => 'product'], function() {
     Route::get('all', [ProductController::class, 'all'])->name('product.all');
 });
 
-Route::get('/sale/my-sales', [SaleController::class, 'mySales'])->name('sale.my-sales');
+Route::get('/sale/my-sales', [SaleController::class, 'checkoutResponse'])->name('sale.my-sales');
 Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
     Route::post('/sale', [SaleController::class, 'sale'])->name('sale.sale');

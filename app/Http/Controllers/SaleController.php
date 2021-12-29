@@ -26,7 +26,6 @@ class SaleController extends Controller
 
 
         $order = Product::where('id', $code)->first();
-        //dd($order, $user);
         if ($order == false) {
             abort(404);
         }
@@ -127,12 +126,13 @@ class SaleController extends Controller
         if ($order == false) {
             abort(404);
         }
-
+        
         $orderRequestPayment = OrderRequestPayment::where('order_id', $order->id)
-            ->where('ending', 0)
-            ->latest()
-            ->first();
-
+        ->where('ending', 0)
+        ->latest()
+        ->first();
+        
+        //dd($orderRequestPayment);
         $placetopay = $this->getClient();
 
         try {
@@ -145,7 +145,7 @@ class SaleController extends Controller
                     $orderRequestPayment->status = $response->status()->status();
                     $orderRequestPayment->ending = 1;
 
-                   // $order->status = Product::STATUS_PAYED;
+                    $order->status = Product::STATUS_PAYED;
                     $order->update();
                 }
 
@@ -153,7 +153,7 @@ class SaleController extends Controller
                 $orderRequestPayment->response = json_encode($response->toArray());
                 $orderRequestPayment->update();
 
-                return view('order-response', [
+                return view('welcome', [
                     'message' => $response->status()->message(),
                 ]);
             } else {
@@ -179,11 +179,14 @@ class SaleController extends Controller
 
     protected function createRequestPayment($orderId, $requestId, $requestUrl)
     {
-        OrderRequestPayment::create([
+        
+         OrderRequestPayment::create([
             'order_id' => $orderId,
             'request_id' => $requestId,
             'process_url' => $requestUrl,
         ]);
+        
+
     }
 
 
