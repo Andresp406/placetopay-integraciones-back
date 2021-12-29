@@ -13,7 +13,7 @@ class ProductController extends Controller
 
         return response()->json([
             'ok'    => true,
-            'message' => 'success search',
+            'message' => 'Busqueda Exitosa',
             'data' => [
                 'products' => $products,
             ]

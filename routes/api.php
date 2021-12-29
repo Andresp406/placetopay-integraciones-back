@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PlacetopayController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
 use App\Models\Product;
@@ -29,8 +30,9 @@ Route::group(['prefix' => 'product'], function() {
     Route::get('all', [ProductController::class, 'all'])->name('product.all');
 });
 
+Route::get('/sale/my-sales', [SaleController::class, 'mySales'])->name('sale.my-sales');
 Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
     Route::post('/sale', [SaleController::class, 'sale'])->name('sale.sale');
-    Route::get('/sale/my-sales', [SaleController::class, 'mySales'])->name('sale.my-sales');
+
 });

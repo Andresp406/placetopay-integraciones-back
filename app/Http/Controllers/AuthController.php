@@ -33,7 +33,7 @@ class AuthController extends Controller
 
         return response()->json([
             'ok' => true,
-            'message' => "Bienvenido {$userAuth->email}",
+            'message' => "Bienvenido {$userAuth->first_name} {$userAuth->last_name}",
             "data" => [
                 "user" => $userAuth,
                 "token" => $userAuth->createToken('personalToken')->plainTextToken,
@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         return response()->json([
             'ok' => false,
-            'message' => "Error altratar de registrar el usuario {$request->name}.",
+            'message' => "Error al registrar el usuario {$request->name}{$request->first_name} {$request->last_name}.",
             "data" => null,
         ], 500);
 
@@ -68,7 +68,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'ok'    => true,
-            'message' => 'User logued',
+            'message' => 'Usuario Logueado',
             'data' => [
                 'user' => auth()->user()
                 ]

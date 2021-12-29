@@ -27,14 +27,12 @@
                 <div class="flex justify-center mt-4">
                     <div class="text-center text-xl text-gray-700 sm:text-left">
                         <div class="flex items-center">
-                           <h1>Ecotierra</h1>
+                           <h1>Placetopay</h1>
                         </div>
                     </div>
                     <br>
 
-{{--                    <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">--}}
-{{--                        Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})--}}
-{{--                    </div>--}}
+
                 </div>
             </div>
         </div>

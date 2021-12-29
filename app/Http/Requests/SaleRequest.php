@@ -13,7 +13,7 @@ class SaleRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;//!auth()->guest();
+        return true;
     }
 
     /**
