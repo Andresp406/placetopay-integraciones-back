@@ -10,27 +10,26 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class SaleController extends Controller
+class OrderController extends Controller
 {
 
    public function sale(SaleRequest $request)
     {
+        //dd($request->price);
         $user = User::find(auth()->id());
         $product = Product::find($request->product_id);
         $total_price = $product->price * $request->amount;
-        $code = $request->product_id;
-
-     
+        $code = $request->product_id;        
 
         $order = Product::where('id', $code)->first();
         if ($order == false) {
             abort(404);
         }
 
-        $placetopay = $this->getClient();
-
+        $placetopay = (new WebServiceController)->getClient();
+        $ip = (new WebServiceController)->getRealIpAddr();
         $reference = $code;
-        $request = [
+        $requestPlacetopay = [
             'payment' => [
                 'reference' => $reference,
                 'description' => $order->description,
@@ -40,28 +39,42 @@ class SaleController extends Controller
                 ],
             ],
             "buyer" => [
-                "name" => $user->first_name . ' ' . $user->last_name,
-                "email" => $user->email,
+                "name" => $request->name,
+                "email" => $request->email,
                 "document" => $user->document,
                 "documentType" => $user->type_document,
                 //"mobile" => 
             ],
             'expiration' => date('c', strtotime(' + 2 days')),
-            'returnUrl' => route('response.checkout') . '?reference=' . $reference,
-            'ipAddress' => '127.0.0.1',
-            'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
+            'returnUrl' => env('RETURN_URL').$reference,
+            'ipAddress' => $ip,
+            'userAgent' => $_SERVER['HTTP_USER_AGENT'],
         ];
 
          try {
-            $response = $placetopay->request($request);
+            $response = $placetopay->request($requestPlacetopay);
 
             if ($response->isSuccessful()) {
                 // Redirect the client to the processUrl or display it on the JS extension
                 $this->createRequestPayment($order->id, $response->requestId(), $response->processUrl());
+
+                $user->r_products()->attach([
+                    $request->product_id =>
+                    [
+                        'amount'    => $request->amount,
+                        'total_price' => $total_price
+                    ]
+                    ]);
+
                 return response([
                     'ok' => true,
-                    'message' => 'order purchase successful generate',
-                    'data' => $response->processUrl(),
+                    'message' => 'orden generada satisfactoriamente',
+                    'data' => [
+                        'url'=> $response->processUrl(),
+                        'product' => $product,
+                        'amount'  => $request->amount,
+                        'total_price' => $total_price,
+                    ],
                 ]);               
             } else {
                 // There was some error so check the message
@@ -69,13 +82,23 @@ class SaleController extends Controller
             }
         } catch (\Exception $e) {
             var_dump($e->getMessage());
-        }
-
-        
+        }        
     }
 
-    public function mySales(Request $request)
+
+    public function checkoutResponse(Request $request)
     {
+        //dd($request->reference);
+        $reference = 1;
+        $order = Product::where('id', $reference)->first();
+        $orderRequestPayment = OrderRequestPayment::where('order_id', $order->id)
+        ->where('ending', 0)
+        ->latest()
+        ->first();
+        $placetopay = (new WebServiceController)->getClient();
+        $response = $placetopay->query($orderRequestPayment->request_id);
+        $user = User::find(auth()->id());
+        
         $data = Product::whereHas('r_user', function ($query) {
             return $query->where('users.id', auth()->id());
 
@@ -86,13 +109,20 @@ class SaleController extends Controller
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
-            'data' => [$data]
+            'data' => [
+                'product' => $data,
+                'user' => $user,
+                'status' => $response->status()->status()
+                ]
         ]);  
     }
 
     
-    public function checkoutResponse(Request $request)
+   /*  public function checkoutResponse(Request $request)
     {
+        $this->mySales($request); */
+        
+        /* $placetopay = $this->getClient();
         
         $reference = $request->reference;
         $order = Product::where('id', $reference)->first();
@@ -105,7 +135,6 @@ class SaleController extends Controller
         ->latest()
         ->first();
         
-        $placetopay = $this->getClient();
 
         try {
             $response = $placetopay->query($orderRequestPayment->request_id);
@@ -120,7 +149,9 @@ class SaleController extends Controller
 
                     $order->status = Product::STATUS_PAYED;
                     $order->update();
-                    $this->saveDatabase($response);
+                    //$this->saveDatabase($response, $this->dataCheckout);
+                    return redirect()->to("http://localhost:4200/orders?{$response->status()->status()}"); 
+
                 }
 
                 $orderRequestPayment->status = $response->status()->status();
@@ -136,54 +167,18 @@ class SaleController extends Controller
             }
         } catch (\Exception $e) {
             var_dump($e->getMessage());
-        }
-    }
+        } */
+   // }
 
-    public function saveDatabase($response){
-        $total_price = $response->request()->payment()->amount()->total();
-
-        dd($response, auth()->user());
-      /*$user->r_products()->attach([
-            $product->id =>
-            [
-                'amount'    => $request->amount,
-                'total_price' => $total_price
-            ]
-            ]);
-        
-        return response([
-            'ok'    =>true,
-            'message' => 'Transaction success',
-            'data' => [
-                'product' => $product,
-                'amount'  => $request->amount,
-                'total_price' => $total_price,
-               
-            ]
-        ]);  */
-  
-    }
-
-    private function getClient()
-    {
-        return new PlacetoPay([
-            'login' => config('placetopay.login'), // Provided by PlacetoPay
-            'tranKey' => config('placetopay.trankey'), // Provided by PlacetoPay
-            'baseUrl' => config('placetopay.baseUrl'),
-            'timeout' => 10, // (optional) 15 by default
-        ]);
-    }
+    
 
     private function createRequestPayment($orderId, $requestId, $requestUrl)
-    {
-        
+    {        
          OrderRequestPayment::create([
             'order_id' => $orderId,
             'request_id' => $requestId,
             'process_url' => $requestUrl,
         ]);
-        
-
     }
 
 

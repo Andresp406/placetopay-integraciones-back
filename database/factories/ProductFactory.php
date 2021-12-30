@@ -18,8 +18,7 @@ class ProductFactory extends Factory
             'name' => $this->faker->name(),
             'description' => $this->faker->text(),
             'img' => $this->faker->imageUrl(300,300),
-            'price' => $this->faker->randomFloat(2, 10, 100),
-            'status' => $this->faker->randomElement(['CREATED', 'APPROVED', 'REJECTED']),
+            'price' => $this->faker->randomFloat(2, 10, 100),            
         ];
     }
 }
