@@ -36,4 +36,13 @@ como buena practica de programacion el back genero responsabilidad a FormRequest
 
 el sistema cuenta con migraciones y sus seeder para generar datos de prueba
 
+## Variable de entorno
+
+se tiene que llenar el archivo .env con las siguientes constantes
+
+- PLACETOPAY_LOGIN
+- PLACETOPAY_TRANKEY
+- PLACETOPAY_BASE_URL
+- RETURN_URL=localhost:4200/orders
+
 
