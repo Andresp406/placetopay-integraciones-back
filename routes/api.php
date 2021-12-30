@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PseController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,13 +27,9 @@ Route::post('/register', [AuthController::class, 'register'])->name('auth.regist
 Route::group(['prefix' => 'product'], function() {
     Route::get('all', [ProductController::class, 'all'])->name('product.all');
 });
-Route::get('/sale/pse', [PseController::class, 'pseCheckout'])->name('checkout.pse');
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/sale/my-sales', [OrderController::class, 'checkoutResponse'])->name('sale.my-sales');
-    //Route::get('/sale/my-sales', [OrderController::class, 'mySales'])->name('sale.my-sales');
     Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
     Route::post('/sale', [OrderController::class, 'sale'])->name('sale.sale');
-
-
 });
