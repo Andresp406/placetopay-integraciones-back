@@ -15,7 +15,6 @@ class OrderController extends Controller
 
    public function sale(SaleRequest $request)
     {
-        //dd($request->price);
         $user = User::find(auth()->id());
         $product = Product::find($request->product_id);
         $total_price = $product->price * $request->amount;
@@ -43,7 +42,6 @@ class OrderController extends Controller
                 "email" => $request->email,
                 "document" => $user->document,
                 "documentType" => $user->type_document,
-                //"mobile" => 
             ],
             'expiration' => date('c', strtotime(' + 2 days')),
             'returnUrl' => env('RETURN_URL').$reference,
@@ -57,7 +55,6 @@ class OrderController extends Controller
             if ($response->isSuccessful()) {
                 // Redirect the client to the processUrl or display it on the JS extension
                 $this->createRequestPayment($order->id, $response->requestId(), $response->processUrl());
-
                 $user->r_products()->attach([
                     $request->product_id =>
                     [
@@ -106,14 +103,28 @@ class OrderController extends Controller
         ->search($request->search)
         ->get();
 
+        foreach($data as $da){
+            $dataStatus = [
+              'name' => $da['name'],
+              'img' => $da['img'],
+              'description' => $da['description'],
+              'price' => $da['price'],
+              'created_at' => $da['created_at'],
+              'status' => $response->status()->status(),
+              'updated_at' => $da['updated_at'],
+              'id' => $da['id'],
+          ]; 
+
+        }
+       // d($dataStatus);
+ 
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
             'data' => [
-                'product' => $data,
+                'product' =>[ $dataStatus],
                 'user' => $user,
-                'status' => $response->status()->status()
-                ]
+            ],
         ]);  
     }
 
