@@ -24,19 +24,15 @@ para la realizacion del back utilice 2 controladores:
 
 cree 2 modelos aparte del modelo por defecto de User:
 
-- model Client cree dos mutators para la fecha y retornala como es requerido y para el FullName ya que por defecto se ingresan aparte, cree un queryScope para el filtro por nombre, ademas de una relacion de uno a muchos con el modelo Sales
+- model Product donde esta un queryScope para hacer un campo de search y la relacion con la tabla pivot product_user
 
-- model Sales solo se lleno la propiedad fillable para la asignacion masiva.
+- model OrderResquestPayment.
 
-En el route service provider cree tres archivos de rutas personalizadas con prefijo api/v1/auth las cuales son:
-
-- routes/api/auth.php
-- routes/api/client.php
-- routes/api/sales.php
+En el route service provider cree el prefijo api/v1/
 
 las cuales son las encargadas de enviar los datos a los endpoint solicitados
 
-como buena practica de programacion el back genero responsabilidad a Rules para la autorizacion por el parametro de edad y tambien por el pago pendiente los cuales 
+como buena practica de programacion el back genero responsabilidad a FormRequest para la Validacion de los formularios 
 
 el sistema cuenta con migraciones y sus seeder para generar datos de prueba
 
