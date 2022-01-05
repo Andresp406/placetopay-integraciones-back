@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Dnetix\Redirection\PlacetoPay;
 
 use App\Http\Requests\SaleRequest;
+use App\Models\Order;
 use App\Models\OrderRequestPayment;
 use App\Models\Product;
 use App\Models\User;
@@ -24,7 +25,6 @@ class OrderController extends Controller
         if ($order == false) {
             abort(404);
         }
-
         $placetopay = (new WebServiceController)->getClient();
         $ip = (new WebServiceController)->getRealIpAddr();
         $reference = $code;
@@ -53,7 +53,8 @@ class OrderController extends Controller
             $response = $placetopay->request($requestPlacetopay);
 
             if ($response->isSuccessful()) {
-                // Redirect the client to the processUrl or display it on the JS extension
+                (new ProductController)->createOrder($request, $user);
+
                 $this->createRequestPayment($order->id, $response->requestId(), $response->processUrl());
                 $user->r_products()->attach([
                     $request->product_id =>
@@ -62,7 +63,9 @@ class OrderController extends Controller
                         'total_price' => $total_price
                     ]
                     ]);
+                    $this->req = $reference;
 
+                    
                 return response([
                     'ok' => true,
                     'message' => 'orden generada satisfactoriamente',
@@ -85,15 +88,20 @@ class OrderController extends Controller
 
     public function checkoutResponse(Request $request)
     {
-        //dd($request->reference);
-        $reference = 1;
-        $order = Product::where('id', $reference)->first();
+        $reference = Order::where('id', auth()->id())->first();
+    
+        $order = Product::where('id', $reference->code)->first();
+    
         $orderRequestPayment = OrderRequestPayment::where('order_id', $order->id)
         ->where('ending', 0)
         ->latest()
         ->first();
         $placetopay = (new WebServiceController)->getClient();
         $response = $placetopay->query($orderRequestPayment->request_id);
+        $orderRequestPayment->status = $response->status()->status();
+        $orderRequestPayment->response = $response->status()->message();
+        $orderRequestPayment->update();
+        
         $user = User::find(auth()->id());
         
         $data = Product::whereHas('r_user', function ($query) {
@@ -103,83 +111,28 @@ class OrderController extends Controller
         ->search($request->search)
         ->get();
 
-        foreach($data as $da){
-            $dataStatus = [
-              'name' => $da['name'],
-              'img' => $da['img'],
-              'description' => $da['description'],
-              'price' => $da['price'],
-              'created_at' => $da['created_at'],
-              'status' => $response->status()->status(),
-              'updated_at' => $da['updated_at'],
-              'id' => $da['id'],
-          ]; 
+ /*        foreach($data as $d){
+         
+            $dataStatus =[
+                'name' => $user->first_name." ". $user->last_name,              
+                'email' => $user->email,
+                'product' => $d->name,              
+                'description' => $d->description,
+                'price' => $d->price,
+                'status' => $orderRequestPayment->status, 
+                'status_message' => $orderRequestPayment->response, 
+                
+            ];        
+        }*/
 
-        }
-       // d($dataStatus);
- 
+        $d = array_push($orderRequestPayment, $user); 
+        dd($d);
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
-            'data' => [
-                'product' =>[ $dataStatus],
-                'user' => $user,
-            ],
+            'data' => [$orderRequestPayment, $user],
         ]);  
     }
-
-    
-   /*  public function checkoutResponse(Request $request)
-    {
-        $this->mySales($request); */
-        
-        /* $placetopay = $this->getClient();
-        
-        $reference = $request->reference;
-        $order = Product::where('id', $reference)->first();
-        if ($order == false) {
-            abort(404);
-        }
-        
-        $orderRequestPayment = OrderRequestPayment::where('order_id', $order->id)
-        ->where('ending', 0)
-        ->latest()
-        ->first();
-        
-
-        try {
-            $response = $placetopay->query($orderRequestPayment->request_id);
-            
-
-            if ($response->isSuccessful()) {
-                // In order to use the functions please refer to the RedirectInformation class
-
-                if ($response->status()->isApproved()) {
-                    $orderRequestPayment->status = $response->status()->status();
-                    $orderRequestPayment->ending = 1;
-
-                    $order->status = Product::STATUS_PAYED;
-                    $order->update();
-                    //$this->saveDatabase($response, $this->dataCheckout);
-                    return redirect()->to("http://localhost:4200/orders?{$response->status()->status()}"); 
-
-                }
-
-                $orderRequestPayment->status = $response->status()->status();
-                $orderRequestPayment->response = json_encode($response->toArray());
-                $orderRequestPayment->update();
-
-           
-                return redirect()->to("http://localhost:4200/orders?{$response->status()->status()}"); 
-           
-            } else {
-                // There was some error with the connection so check the message
-                print_r($response->status()->message() . "\n");
-            }
-        } catch (\Exception $e) {
-            var_dump($e->getMessage());
-        } */
-   // }
 
     
 

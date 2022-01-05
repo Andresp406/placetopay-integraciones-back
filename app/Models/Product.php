@@ -10,9 +10,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    const STATUS_CREATED = 'CREATED';
-    const STATUS_PAYED = 'APPROVED';
-    const STATUS_REJECTED = 'REJECTED';
+  
 
     public function scopeSearch(Builder $query, $term): Builder
     {
