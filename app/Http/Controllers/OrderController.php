@@ -7,6 +7,7 @@ use Dnetix\Redirection\PlacetoPay;
 use App\Http\Requests\SaleRequest;
 use App\Models\Order;
 use App\Models\OrderRequestPayment;
+use App\Models\OrderResponse;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -111,9 +112,10 @@ class OrderController extends Controller
         ->search($request->search)
         ->get();
 
- /*        foreach($data as $d){
+         foreach($data as $d){
          
-            $dataStatus =[
+            OrderResponse::create([
+                'id_user'=> $user->id,
                 'name' => $user->first_name." ". $user->last_name,              
                 'email' => $user->email,
                 'product' => $d->name,              
@@ -122,15 +124,13 @@ class OrderController extends Controller
                 'status' => $orderRequestPayment->status, 
                 'status_message' => $orderRequestPayment->response, 
                 
-            ];        
-        }*/
-
-        $d = array_push($orderRequestPayment, $user); 
-        dd($d);
+            ]);        
+        }
+        $dataStatus =  OrderResponse::where('email', $user->email)->get();
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
-            'data' => [$orderRequestPayment, $user],
+            'data' => $dataStatus,
         ]);  
     }
 
