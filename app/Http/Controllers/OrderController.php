@@ -111,22 +111,10 @@ class OrderController extends Controller
         })
         ->search($request->search)
         ->get();
+      
+        $this->createResponseOrder($user, $reference, $data, $orderRequestPayment);
 
-         foreach($data as $d){
-         
-            OrderResponse::create([
-                'id_user'=> $user->id,
-                'name' => $user->first_name." ". $user->last_name,              
-                'email' => $user->email,
-                'product' => $d->name,              
-                'description' => $d->description,
-                'price' => $d->price,
-                'status' => $orderRequestPayment->status, 
-                'status_message' => $orderRequestPayment->response, 
-                
-            ]);        
-        }
-        $dataStatus =  OrderResponse::where('email', $user->email)->get();
+        $dataStatus =  OrderResponse::where('order_id', $reference->code)->get();
         return response([
             'ok'    =>true,
             'message' => 'Transaction success',
@@ -144,6 +132,22 @@ class OrderController extends Controller
             'process_url' => $requestUrl,
         ]);
     }
+
+    private function createResponseOrder($user, $reference, $data, $orderRequestPayment){
+        foreach($data as $d){         
+            OrderResponse::create([
+                'name' => $user->first_name." ". $user->last_name,              
+                'email' => $user->email,
+                'product' => $d->name,              
+                'description' => $d->description,
+                'price' => $d->price,
+                'status' => $orderRequestPayment->status, 
+                'status_message' => $orderRequestPayment->response, 
+                'order_id'=> $reference->code,
+                
+            ]);        
+        }
+    }   
 
 
 

@@ -15,7 +15,7 @@ class CreateOrderResponseTable extends Migration
     {
         Schema::create('order_response', function (Blueprint $table) {
             $table->id();
-            $table->smallInteger('id_user');
+            $table->smallInteger('order_id');
             $table->string('name');
             $table->string('email');
             $table->string('product');

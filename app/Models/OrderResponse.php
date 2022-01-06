@@ -43,7 +43,7 @@ class OrderResponse extends Model
             'description',
             'status_message',
             'status',
-            'id_user'
+            'order_id'
         ];
 
         /**
